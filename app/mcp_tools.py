@@ -6,7 +6,7 @@ from mcp.server.fastmcp import FastMCP
 # If you also need httpx for other network calls (like in the weather tutorial), import it:
 # import httpx
 
-from app.spark_queries import filter_zipcodes
+from .spark_queries import filter_zipcodes
 
 # Initialize FastMCP server (similar to the weather tutorial)
 mcp = FastMCP("spark")
