@@ -2,3 +2,5 @@ fastapi
 uvicorn[standard]
 pyspark
 python-multipart
+starlette
+mcp[cli]

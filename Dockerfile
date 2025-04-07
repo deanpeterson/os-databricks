@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# 1) Install Java (OpenJDK) + procps (for 'ps'), then cleanup
+# 1) Install Java (OpenJDK) + procps (for Spark) and clean up
 RUN apt-get update && apt-get install -y \
     openjdk-17-jdk-headless \
     procps \
@@ -16,31 +16,18 @@ WORKDIR /app
 # 4) Copy requirements.txt first so Docker can cache pip installs
 COPY requirements.txt /app/
 
-# ------------------------------------------------------------------------
-# 4A) Option A: Add mcp[cli] to your requirements.txt
-#
-#    If your requirements.txt already includes this line:
-#    mcp[cli]
-#    then a single pip install command is enough:
-#
-# RUN pip install --upgrade pip && pip install -r requirements.txt
-#
-# ------------------------------------------------------------------------
-# 4B) Option B: Install your existing requirements + mcp[cli] in one go
-#    (if you do NOT want to modify requirements.txt directly).
-#    In that case, do:
+# 5) Install dependencies.
+#    Make sure your `requirements.txt` includes:
+#    mcp[cli], uvicorn, starlette, pyspark, etc. as needed for your project
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt && \
-    pip install "mcp[cli]"
-# ------------------------------------------------------------------------
+    pip install -r requirements.txt
 
-# 5) Copy your application code (including mcp_main.py) into /app
+# 6) Copy the rest of your code into /app
 COPY app/ /app/app
 COPY lib/ /app/lib
 
-# 6) Expose port 8000 ONLY if you need it for something else.
-#    MCP typically runs on stdio or SSE, so you might not need this.
+# 7) Expose port 8000 for SSE/HTTP
 EXPOSE 8000
 
-# 7) Run your MCP server code
-CMD ["python", "-u", "-m", "app.mcp_main"]
+# 8) Run Uvicorn with the module path to your Starlette app
+CMD ["uvicorn", "app.mcp_main:app", "--host", "0.0.0.0", "--port", "8000"]
