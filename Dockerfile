@@ -28,4 +28,4 @@ COPY lib/ /app/lib
 EXPOSE 8000
 
 # Use python to run your MCP server code
-CMD [\"python\", \"-u\", \"app/mcp_main.py\"]
+CMD ["python", "-u", "app/mcp_main.py"]
